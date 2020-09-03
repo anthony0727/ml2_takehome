@@ -36,7 +36,9 @@ services:
             retries: 3
       
     train_server:
-        build: ./train_server
+        build:
+            context: .
+            dockerfile: ./Dockerfile.train_server
         image: train_server
     
     tensorflow_serving:
@@ -45,12 +47,13 @@ services:
             - '8500:8500'
             - '8501:8501'
         volumes:
-            - './train_server/models:/models'
+            - './train_server/models/tensorflow:/models'
          
     torchserve:
         image: pytorch/torchserve
+        ports:
             - '8081:8081'
             - '8082:8082'
         volumes:
-            - './train_server/models:/home/model-server/model-store'
+            - './train_server/models/torchserve:/home/model-server/model-store'
         command: torchserve --start --model-store model_store --models lenet5=lenet5.mar
