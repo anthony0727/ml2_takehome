@@ -1,3 +1,0 @@
-/home/anthony/repo/examples/cpp/mnist/build/CMakeFiles/rebuild_cache.dir
-/home/anthony/repo/examples/cpp/mnist/build/CMakeFiles/edit_cache.dir
-/home/anthony/repo/examples/cpp/mnist/build/CMakeFiles/mnist.dir

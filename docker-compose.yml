@@ -1,0 +1,56 @@
+version: '3.7'
+services:
+    postgres:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+
+    webserver:
+        image: puckel/docker-airflow:1.10.9
+        restart: always
+        depends_on:
+            - postgres
+        environment:
+            - LOAD_EX=n
+            - EXECUTOR=Local
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        volumes:
+            - ./airflow_server/dags:/usr/local/airflow/dags
+            # - ./plugins:/usr/local/airflow/plugins
+        ports:
+            - "8080:8080"
+        command: webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+      
+    train_server:
+        build: ./train_server
+        image: train_server
+    
+    tensorflow_serving:
+        image: tensorflow/serving
+        ports:
+            - '8500:8500'
+            - '8501:8501'
+        volumes:
+            - './train_server/models:/models'
+         
+    torchserve:
+        image: pytorch/torchserve
+            - '8081:8081'
+            - '8082:8082'
+        volumes:
+            - './train_server/models:/home/model-server/model-store'
+        command: torchserve --start --model-store model_store --models lenet5=lenet5.mar
