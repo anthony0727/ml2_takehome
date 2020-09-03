@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 find_package(Torch REQUIRED)
 
-add_executable(lenet5_libtorch lenet5_libtorch.cpp)
+add_executable(lenet5_libtorch ./src/lenet5_libtorch.cpp ./src/lenet5_libtorch.hpp)
 target_compile_features(lenet5_libtorch PUBLIC cxx_range_for)
 target_link_libraries(lenet5_libtorch ${TORCH_LIBRARIES})
 
