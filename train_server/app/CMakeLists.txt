@@ -4,7 +4,7 @@ project(lenet5_libtorch)
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
-add_executable(lenet5_libtorch lenet5_libtorch.cpp)
+add_executable(lenet5_libtorch src/lenet5_libtorch.cpp src/lenet5_libtorch.hpp)
 target_link_libraries(lenet5_libtorch "${TORCH_LIBRARIES}")
 set_property(TARGET lenet5_libtorch PROPERTY CXX_STANDARD 14)
 

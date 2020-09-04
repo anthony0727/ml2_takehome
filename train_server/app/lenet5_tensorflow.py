@@ -1,3 +1,4 @@
+import os
 import argparse
 import numpy as np
 
@@ -9,11 +10,8 @@ def load_mnist():
     (train_X, train_Y), (test_X, test_Y) = load_data()
     train_X = train_X/255.
     train_X = np.expand_dims(train_X, axis=-1)
-    test_X = test_X/255. 
+    test_X = test_X/255.
     test_X = np.expand_dims(test_X, axis=-1)
-
-    print(train_X.shape)
-    print(train_Y.shape)
 
     return (train_X, train_Y), (test_X, test_Y)
 
@@ -26,8 +24,9 @@ def build_lenet5():
         layers.Conv2D(
             filters=6, 
             kernel_size=(5, 5),
-            activation='tanh', 
-            input_shape=(32, 32, 1)
+            activation='tanh',
+            padding='same',
+            input_shape=(1, 32, 32, 1)
         )
     )
     model.add(layers.MaxPool2D())
@@ -36,6 +35,7 @@ def build_lenet5():
         layers.Conv2D(
             filters=16, 
             kernel_size=(5, 5),
+            padding='same',
             activation='tanh'
         )
     )
@@ -70,6 +70,7 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int)
     parser.add_argument('--batch_size', type=int)
     parser.add_argument('--lr', type=float)
+    parser.add_argument('--model_path', type=str)
 
     args = parser.parse_args()
 
@@ -79,9 +80,11 @@ if __name__ == "__main__":
 
     model.compile(
         loss='sparse_categorical_crossentropy',
-        optimizer='adam',
+        optimizer=keras.optimizers.Adam(args.lr),
         metrics=[keras.metrics.SparseCategoricalAccuracy()]
     )
+    # model.build(input_shape=(1, 28, 28, 1))
+    # print(model.summary())
 
     # # Create a callback that saves the model's weights
     # cp_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -98,6 +101,8 @@ if __name__ == "__main__":
         # callbacks=[cp_callback]
     )
 
+    model.summary()
+
     loss, acc = model.evaluate(*test_data)
 
-    model.save('../models/tensorflow')
+    model.save(os.path.join(args.model_path, 'tensorflow'))
