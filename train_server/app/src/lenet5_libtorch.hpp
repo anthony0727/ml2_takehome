@@ -12,8 +12,7 @@ const int64_t kLogInterval = 10;
 
 struct Net : torch::nn::Module {
   Net()
-      : c1(torch::nn::Conv2dOptions(1, 6, /*kernel_size=*/{5, 5})
-                  .padding({2, 2})),
+      : c1(torch::nn::Conv2dOptions(1, 6, /*kernel_size=*/{5, 5}).padding({2, 2})),
         c3(torch::nn::Conv2dOptions(6, 16, /*kernel_size=*/{5, 5})),
         c5(torch::nn::Conv2dOptions(16, 120, /*kernel_size=*/{5, 5})),
         f6(120, 84),
