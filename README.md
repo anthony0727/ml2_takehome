@@ -77,6 +77,7 @@ Libtorch C++ code is reviewed [here]
 ## Dev Note
 
 having trouble with loading TorchScript generated model to torchserve
+
 ```2020-09-04 12:36:07,574 [INFO ] W-9003-lenet5_1.0-stdout org.pytorch.serve.wlm.WorkerLifeCycle - torch.nn.modules.module.ModuleAttributeError: 'RecursiveScriptModule' object has no attribute 'forward```
 
 why torchserve cannot recognize model?
