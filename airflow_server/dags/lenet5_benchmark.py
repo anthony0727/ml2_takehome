@@ -32,17 +32,15 @@ dag = DAG(DAG_ID, default_args=default_args, schedule_interval=schedule_interval
 sensors
 """
 
-# price_final_car2vec_2048x8_1024x8_dro_0.8_49
-# sales_dur_final_car2vec_2048x8_1024x8_dro_0.8_49
-# Depreciation_residual
-
-price_pb_sensor = SFTPSensor(
+"""
+model_sensor = SFTPSensor(
     task_id='mar_sensor',
-    path=pb_path('price'),
+    path=
     sftp_conn_id='sftp_default',
     poke_interval=5,
     dag=dag
 )
+"""
 
 """
 tasks
@@ -55,24 +53,24 @@ train_libtorch = DockerOperator(
     task_id='train_libtorch',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
-    command=f'cd /home/train_server/app/lenet_libtorch; ./lenet5_libtorch ./data ../../models/libtorch/model.pt 64 1000 10 0.01',
+    command='cd /home/train_server/app/lenet_libtorch; ./lenet5_libtorch {data_path} {model_path} {train_bath_sz} {test_batch_sz} {n_epochs} {lr}'.format(**libtorch_config),
     dag=dag
 )
 
 pytorch_config = config['pytorch']
-train = DockerOperator(
-    task_id='data',
+train_pytorch = DockerOperator(
+    task_id='train_pytorch',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
     dag=dag
 )
 
 tensorflow_config = config['tensorflow']
-train_libtorch = DockerOperator(
-    task_id='train_libtorch',
+train_tensorflow = DockerOperator(
+    task_id='train_tensorflow',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
-    command=f'cd /home/train_server/app; python3 lenet5_tensorflow.py --epochs {} --batch_size {} --lr {} --model_path {}'.format(),
+    command=f'cd /home/train_server/app; python3 lenet5_tensorflow.py --epochs {epochs} --batch_size {batch_size} --lr {lr} --model_path {model_path}'.format(**tensorflow_config),
     dag=dag
 )
 
@@ -83,3 +81,5 @@ archive_model = DockerOperator(
     command='torch-model-archiver --model-name lenet5 --serialized-file model.pt --handler image_classifier',
     dag=dag
 )
+
+train_libtorch >> train_pytorch >> train_tensorflow >> archive_model
