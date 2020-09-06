@@ -53,10 +53,11 @@ train_libtorch = DockerOperator(
     task_id='train_libtorch',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
-    command='cd /home/train_server/app/lenet_libtorch; ./lenet5_libtorch {data_path} {model_path} {train_bath_sz} {test_batch_sz} {n_epochs} {lr}'.format(**libtorch_config),
+    command='/home/app/lenet_libtorch/lenet5_libtorch {data_path} {model_path} {train_batch_sz} {test_batch_sz} {n_epochs} {lr}'.format(**libtorch_config),
     dag=dag
 )
 
+"""
 pytorch_config = config['pytorch']
 train_pytorch = DockerOperator(
     task_id='train_pytorch',
@@ -64,16 +65,18 @@ train_pytorch = DockerOperator(
     docker_url='unix://var/run/docker.sock',
     dag=dag
 )
+"""
 
 tensorflow_config = config['tensorflow']
 train_tensorflow = DockerOperator(
     task_id='train_tensorflow',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
-    command=f'cd /home/train_server/app; python3 lenet5_tensorflow.py --epochs {epochs} --batch_size {batch_size} --lr {lr} --model_path {model_path}'.format(**tensorflow_config),
+    command='python3 /home/app/lenet5_tensorflow.py --epochs {epochs} --batch_size {batch_size} --lr {lr} --model_path {model_path}'.format(**tensorflow_config),
     dag=dag
 )
 
+"""
 archive_model = DockerOperator(
     task_id='data',
     image='train_server',
@@ -81,5 +84,5 @@ archive_model = DockerOperator(
     command='torch-model-archiver --model-name lenet5 --serialized-file model.pt --handler image_classifier',
     dag=dag
 )
-
-train_libtorch >> train_pytorch >> train_tensorflow >> archive_model
+"""
+train_libtorch >> train_tensorflow 

@@ -1,30 +1,39 @@
-version: '3.7'
+version: '2.1'
 services:
+    redis:
+        image: 'redis:5.0.5'
+        # command: redis-server --requirepass redispass
+
     postgres:
         image: postgres:9.6
         environment:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
-        logging:
-            options:
-                max-size: 10m
-                max-file: "3"
+        # Uncomment these lines to persist data on the local filesystem.
+            - PGDATA=/var/lib/postgresql/data/pgdata
+        # volumes:
+            - ./pgdata:/var/lib/postgresql/data/pgdata
 
     webserver:
-        image: puckel/docker-airflow:1.10.9
+        image: airflow
         restart: always
         depends_on:
             - postgres
+            - redis
         environment:
             - LOAD_EX=n
-            - EXECUTOR=Local
-        logging:
-            options:
-                max-size: 10m
-                max-file: "3"
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+              #- REDIS_PASSWORD=redispass
         volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
             - ./airflow_server/dags:/usr/local/airflow/dags
+            - ./airflow_server/variables.json:/usr/local/airflow/variables.json
+            # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         ports:
             - "8080:8080"
@@ -34,28 +43,87 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-      
+
+    flower:
+        image: airflow
+        restart: always
+        depends_on:
+            - redis
+        environment:
+            - EXECUTOR=Celery
+              #- REDIS_PASSWORD=redispass
+        ports:
+            - "5555:5555"
+        command: flower
+
+    scheduler:
+        image: airflow
+        restart: always
+        depends_on:
+            - webserver
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./airflow_server/dags:/usr/local/airflow/dags
+            - ./airflow_server/variables.json:/usr/local/airflow/variables.json
+            # Uncomment to include custom plugins
+            # - ./plugins:/usr/local/airflow/plugins
+        environment:
+            - LOAD_EX=n
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+            # - REDIS_PASSWORD=redispass
+        command: scheduler
+
+    worker:
+        image: airflow
+        restart: always
+        depends_on:
+            - scheduler
+        volumes:
+            - ./airflow_server/dags:/usr/local/airflow/dags
+            - ./airflow_server/variables.json:/usr/local/airflow/variables.json
+            - /var/run/docker.sock:/var/run/docker.sock
+            # Uncomment to include custom plugins
+            # - ./plugins:/usr/local/airflow/plugins
+        environment:
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+              #- REDIS_PASSWORD=redispass
+        command: worker
+
     train_server:
         image: train_server:latest
         build: ./train_server
         tty: true
         stdin_open: true
         volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
             - './train_server/models:/home/models'
-    
+
     tensorflow_serving:
         image: tensorflow/serving
         ports:
             - '8500:8500'
             - '8501:8501'
         volumes:
-            - './train_server/models/tensorflow:/models'
-         
+            - /var/run/docker.sock:/var/run/docker.sock
+            - './train_server/models/tensorflow:/models/lenet5'
+        environment:
+            - 'MODEL_NAME=lenet5'
+
     torchserve:
         image: pytorch/torchserve
         ports:
             - '8081:8081'
             - '8082:8082'
         volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
             - './train_server/models/torchserve:/home/model-server/model-store'
-        command: torchserve --start --model-store model_store --models lenet5=lenet5.mar
+        command: torchserve --start --ncs --model-store /home/model-server/model_store --models lenet5=lenet5.mar
+
