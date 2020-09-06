@@ -36,10 +36,12 @@ services:
             retries: 3
       
     train_server:
-        build:
-            context: .
-            dockerfile: ./Dockerfile.train_server
-        image: train_server
+        image: train_server:latest
+        build: ./train_server
+        tty: true
+        stdin_open: true
+        volumes:
+            - './train_server/models:/home/models'
     
     tensorflow_serving:
         image: tensorflow/serving

@@ -1,3 +1,5 @@
+from datetime import date
+import sys
 import os
 import argparse
 import numpy as np
@@ -72,6 +74,10 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float)
     parser.add_argument('--model_path', type=str)
 
+    if len(sys.argv) != 9:
+        print("usage: python3 lenet5_tensorflow.py --epochs 10 --batch_size 64 --lr 0.01 --model_path ../models")
+        exit()
+
     args = parser.parse_args()
 
     train_data, test_data = load_mnist()
@@ -83,26 +89,16 @@ if __name__ == "__main__":
         optimizer=keras.optimizers.Adam(args.lr),
         metrics=[keras.metrics.SparseCategoricalAccuracy()]
     )
-    # model.build(input_shape=(1, 28, 28, 1))
-    # print(model.summary())
-
-    # # Create a callback that saves the model's weights
-    # cp_callback = tf.keras.callbacks.ModelCheckpoint(
-    #     filepath=checkpoint_path,
-    #     save_weights_only=True,
-    #     verbose=1
-    # )
 
     model.fit(
         *train_data,
         batch_size=args.batch_size, 
         epochs=args.epochs
-        # validation_data=test_data
-        # callbacks=[cp_callback]
     )
 
     model.summary()
 
     loss, acc = model.evaluate(*test_data)
 
-    model.save(os.path.join(args.model_path, 'tensorflow'))
+    model.save(os.path.join(args.model_path, 'tensorflow', date.today().strftime('%Y%m%d'))
+
