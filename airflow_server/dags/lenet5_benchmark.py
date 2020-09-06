@@ -1,7 +1,4 @@
 import os
-import random
-import subprocess
-import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -28,7 +25,7 @@ default_args = {
 }
 
 DAG_ID = Path(__file__).stem
-schedule_interval = Variable.get("schedule_interval", deserialize_json=True)['sise']
+schedule_interval = Variable.get("schedule_interval", deserialize_json=True)
 dag = DAG(DAG_ID, default_args=default_args, schedule_interval=schedule_interval)
 
 """
@@ -51,17 +48,31 @@ price_pb_sensor = SFTPSensor(
 tasks
 """
 
-data = DockerOperator(
+config = Variable.get('config', deserialize_json=True)
+libtorch_config = config['libtorch']
+
+train_libtorch = DockerOperator(
+    task_id='train_libtorch',
+    image='train_server',
+    docker_url='unix://var/run/docker.sock',
+    command=f'cd /home/train_server/app/lenet_libtorch; ./lenet5_libtorch ./data ../../models/libtorch/model.pt 64 1000 10 0.01',
+    dag=dag
+)
+
+pytorch_config = config['pytorch']
+train = DockerOperator(
     task_id='data',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
     dag=dag
 )
 
-train = DockerOperator(
-    task_id='data',
+tensorflow_config = config['tensorflow']
+train_libtorch = DockerOperator(
+    task_id='train_libtorch',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
+    command=f'cd /home/train_server/app; python3 lenet5_tensorflow.py --epochs {} --batch_size {} --lr {} --model_path {}'.format(),
     dag=dag
 )
 
