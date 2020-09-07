@@ -17,7 +17,7 @@ services:
 
     webserver:
         image: airflow
-        restart: always
+        #restart: always
         depends_on:
             - postgres
             - redis
@@ -46,7 +46,7 @@ services:
 
     flower:
         image: airflow
-        restart: always
+        #restart: always
         depends_on:
             - redis
         environment:
@@ -58,13 +58,13 @@ services:
 
     scheduler:
         image: airflow
-        restart: always
+        #restart: always
         depends_on:
             - webserver
         volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
             - ./airflow_server/dags:/usr/local/airflow/dags
             - ./airflow_server/variables.json:/usr/local/airflow/variables.json
+            - /var/run/docker.sock:/var/run/docker.sock
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         environment:
@@ -79,7 +79,7 @@ services:
 
     worker:
         image: airflow
-        restart: always
+        #restart: always
         depends_on:
             - scheduler
         volumes:
@@ -104,7 +104,8 @@ services:
         stdin_open: true
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - './train_server/models:/home/models'
+            - ./train_server/models:/home/models
+            - ./train_server/app:/home/app
 
     tensorflow_serving:
         image: tensorflow/serving
@@ -113,7 +114,7 @@ services:
             - '8501:8501'
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - './train_server/models/tensorflow:/models/lenet5'
+            - ./train_server/models/tensorflow:/models/lenet5
         environment:
             - 'MODEL_NAME=lenet5'
 
@@ -124,6 +125,6 @@ services:
             - '8082:8082'
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - './train_server/models/torchserve:/home/model-server/model-store'
+            - ./train_server/models/libtorch:/home/model-server/model-store
         command: torchserve --start --ncs --model-store /home/model-server/model_store --models lenet5=lenet5.mar
 

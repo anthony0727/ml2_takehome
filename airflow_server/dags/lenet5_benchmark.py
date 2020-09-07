@@ -48,15 +48,17 @@ tasks
 
 config = Variable.get('config', deserialize_json=True)
 libtorch_config = config['libtorch']
-
 train_libtorch = DockerOperator(
     task_id='train_libtorch',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
-    command='/home/app/lenet_libtorch/lenet5_libtorch {data_path} {model_path} {train_batch_sz} {test_batch_sz} {n_epochs} {lr}'.format(**libtorch_config),
+    command='./main {data_path} {model_path} {train_batch_sz} {test_batch_sz} {n_epochs} {lr}'.format(**libtorch_config),
+    working_dir='/home/app/lenet5_libtorch',
+    xcom_push=True,
+    xcom_all=True,
+    tty=True,
     dag=dag
 )
-
 """
 pytorch_config = config['pytorch']
 train_pytorch = DockerOperator(
@@ -72,7 +74,11 @@ train_tensorflow = DockerOperator(
     task_id='train_tensorflow',
     image='train_server',
     docker_url='unix://var/run/docker.sock',
-    command='python3 /home/app/lenet5_tensorflow.py --epochs {epochs} --batch_size {batch_size} --lr {lr} --model_path {model_path}'.format(**tensorflow_config),
+    command='python3 lenet5_tensorflow.py --epochs {epochs} --batch_size {batch_size} --lr {lr} --model_path {model_path}'.format(**tensorflow_config),
+    working_dir='/home/app',
+    xcom_push=True,
+    xcom_all=True,
+    tty=True,
     dag=dag
 )
 
@@ -85,4 +91,4 @@ archive_model = DockerOperator(
     dag=dag
 )
 """
-train_libtorch >> train_tensorflow 
+train_libtorch >> train_tensorflow

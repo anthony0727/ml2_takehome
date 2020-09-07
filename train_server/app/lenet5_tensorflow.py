@@ -100,5 +100,8 @@ if __name__ == "__main__":
 
     loss, acc = model.evaluate(*test_data)
 
-    model.save(os.path.join(args.model_path, 'tensorflow', date.today().strftime('%Y%m%d'))
+    export_dir = os.path.join(args.model_path, 'tensorflow', date.today().strftime('%Y%m%d'))
+    if not os.path.exists(export_dir):
+        os.makedirs(export_dir, exist_ok=True)
 
+    model.save(export_dir)
