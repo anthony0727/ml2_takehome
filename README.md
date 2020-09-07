@@ -53,7 +53,7 @@ Followings are covered :
 
 ## Architecture
 
-TODO: Diagram
+[['img/archi.png']]
 
 ## Modeling
 
@@ -84,3 +84,6 @@ why torchserve cannot recognize model?
 
 looking into load_model logic in torchserve, still can't figure out why
 
+## Reference
+
+docker.sock
