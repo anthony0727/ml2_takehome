@@ -10,7 +10,6 @@ services:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
-        # Uncomment these lines to persist data on the local filesystem.
             - PGDATA=/var/lib/postgresql/data/pgdata
         # volumes:
             - ./pgdata:/var/lib/postgresql/data/pgdata
@@ -62,11 +61,9 @@ services:
         depends_on:
             - webserver
         volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
             - ./airflow_server/dags:/usr/local/airflow/dags
             - ./airflow_server/variables.json:/usr/local/airflow/variables.json
-            - /var/run/docker.sock:/var/run/docker.sock
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
         environment:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
@@ -83,11 +80,9 @@ services:
         depends_on:
             - scheduler
         volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
             - ./airflow_server/dags:/usr/local/airflow/dags
             - ./airflow_server/variables.json:/usr/local/airflow/variables.json
-            - /var/run/docker.sock:/var/run/docker.sock
-            # Uncomment to include custom plugins
-            # - ./plugins:/usr/local/airflow/plugins
         environment:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
@@ -114,17 +109,18 @@ services:
             - '8501:8501'
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - ./train_server/models/tensorflow:/models/lenet5
+            - ./models/tensorflow:/models/lenet5
         environment:
             - 'MODEL_NAME=lenet5'
 
     torchserve:
         image: pytorch/torchserve
         ports:
-            - '8081:8081'
-            - '8082:8082'
+            - '8081:8080'
+            - '8082:8081'
+            - '8083:8082'
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - ./train_server/models/libtorch:/home/model-server/model-store
-        command: torchserve --start --ncs --model-store /home/model-server/model_store --models lenet5=lenet5.mar
+            - ./models/libtorch:/home/model-server/model-store
+        command: torchserve --start --ncs --model-store /home/model-server/model-store --models lenet5=lenet5.mar
 
