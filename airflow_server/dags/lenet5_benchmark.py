@@ -12,7 +12,7 @@ DAG
 default_args = {
     'owner': 'anthony',
     'depends_on_past': False,
-    'start_date': datetime(2020, 6, 1),
+    'start_date': datetime(2020, 9, 1),
     'email': ['anthony@example.com'],
     'email_on_failure': False,
     'email_on_retry': False,
