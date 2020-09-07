@@ -53,7 +53,7 @@ Followings are covered :
 
 ## Architecture
 
-[['img/archi.png']]
+![](img/archi.png)
 
 ## Modeling
 
