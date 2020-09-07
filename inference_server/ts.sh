@@ -1,1 +1,1 @@
-docker run --rm -it -p 8080:8080 -p 8081:8081 -v /home/anthony/repo/ml2_takehome/train_server/models/libtorch:/home/model-server/model-store pytorch/torchserve torchserve --start --ncs --model-store /home/model-server/model-store --models lenet5=lenet5.mar
+docker run --rm -it -p 8080:8080 -p 8081:8081 -v /home/models/libtorch:/home/model-server/model-store pytorch/torchserve torchserve --start --ncs --model-store /home/model-server/model-store --models lenet5=lenet5.mar
