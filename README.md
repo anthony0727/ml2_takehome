@@ -22,6 +22,8 @@ Which inlcudes:
 
 ## Usage
 
+### build & run
+
 ```docker-compose up -d```
 
 url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com
