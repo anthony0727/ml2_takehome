@@ -22,6 +22,27 @@ Which inlcudes:
 
 ## Usage
 
+### Training
+
+1. open airflow 
+
+url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com:8080
+
+2. click play button
+
+![](img/airflow.png)
+
+### Inference
+
+[jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) 
+
+Followings are covered : 
+
+* sample requests to each server
+* benchmark with apache benchmark(ab)
+
+### build & run
+
 url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com
 
 |                    | port                                     |
@@ -29,9 +50,6 @@ url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com
 | airflow            | 8080: admin                              |
 | torchserve         | 8081: Management API 8082: Inference API |
 | tensorflow/serving | 8500: gRPC 8501: REST API                |
-
-
-### build & run
 
 prerequisites :
 
@@ -50,22 +68,6 @@ build . -t train_server
 cd ml2_takehome
 docker-compose up -d
 ```
-
-### Training
-
-click play button
-
-![](img/airflow.png)
-
-### Inference
-
-[jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) 
-
-Followings are covered : 
-
-* sample requests to each server
-* benchmark with apache benchmark(ab)
-
 
 ## Architecture
 
@@ -104,7 +106,7 @@ Since this project is mainly focused on implementation of Lenet5 with Libtorch,
 Libtorch C++ code is reviewed [here](https://github.com/anthony0727/ml2_takehome/wiki/Code-Review)
 
 ## Dev Note
----
+
 having trouble with loading TorchScript generated model to torchserve
 
 ```
