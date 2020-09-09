@@ -22,29 +22,35 @@ Which inlcudes:
 
 ## Usage
 
+### build & run
+
 ```docker-compose up -d```
 
-url : aws.com
+url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com
 
-port
-
-8080 airflow
-
-8081-8082 ts
-
-8500-8501 tfs
-
-??? tensorboard
+|                    | port                                     |
+|--------------------|------------------------------------------|
+| airflow            | 8080: admin                              |
+| torchserve         | 8081: Management API 8082: Inference API |
+| tensorflow/serving | 8500: gRPC 8501: REST API                |
 
 ### Training
 
-airflow triggering image
+![](img/airflow.png)
+
+click play button
 
 ### Inference
 
-[API table]
+tensorflow/serving
 
-refer to [jupyter notebook] containing 
+POST http://host:port/v1/models/${MODEL_NAME}[/versions/${VERSION}|/labels/${LABEL}]:predict
+
+torchserve
+
+curl http://127.0.0.1:8080/predictions/densenet161 -T kitten.jpg
+
+refer to [jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) 
 
 Followings are covered : 
 
