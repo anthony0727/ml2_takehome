@@ -92,15 +92,15 @@ services:
               #- REDIS_PASSWORD=redispass
         command: worker
 
-    train_server:
-        image: train_server:latest
-        build: ./train_server
-        tty: true
-        stdin_open: true
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-            - ./train_server/models:/home/models
-            - ./train_server/app:/home/app
+        #train_server:
+        #image: train_server:latest
+        #build: ./train_server
+        #tty: true
+        #stdin_open: true
+        #volumes:
+        #    - /var/run/docker.sock:/var/run/docker.sock
+        #    - ./models:/home/models
+        #      #- ./train_server/app:/home/app
 
     tensorflow_serving:
         image: tensorflow/serving

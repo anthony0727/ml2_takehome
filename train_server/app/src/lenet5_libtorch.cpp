@@ -3,12 +3,16 @@
 torch::Tensor Net::forward(torch::Tensor x)
 {
   x = c1->forward(x);                       // 6@28x28
+  x = torch::relu(x);
   x = torch::max_pool2d(x, {2, 2}, {2, 2}); // 6@14x14
   x = c3->forward(x);                       // 16@10x10
+  x = torch::relu(x);
   x = torch::max_pool2d(x, {2, 2}, {2, 2}); // 16@10x10
   x = c5->forward(x);                       // 120@1x1
+  x = torch::relu(x);
   x = x.view({x.size(0), -1});
   x = f6->forward(x);     // 120->84
+  x = torch::relu(x);
   x = output->forward(x); // 84->10
   x = torch::log_softmax(x, /*dim=*/1);
 
@@ -91,8 +95,8 @@ auto main(int argc, char *argv[]) -> int
 {
   if (argc != 7)
   {
-    cerr << "usage: lenet5_libtorch <data_path> <model_path> <train_batch_sz> <test_batch_sz> <n_epoch> <lr>\n"
-         << "example: lenet5_libtorch ./data ../../models/libtorch/model.pt 64 1000 10 0.01" << endl;
+    cerr << "usage: ./main <data_path> <model_path> <train_batch_sz> <test_batch_sz> <n_epoch> <lr>\n"
+         << "example: ./main ./data ../../models/libtorch/model.pt 64 1000 10 0.01" << endl;
 
     return -1;
   }
@@ -169,3 +173,4 @@ auto main(int argc, char *argv[]) -> int
 
   // std::cout << "ok\n";
 }
+

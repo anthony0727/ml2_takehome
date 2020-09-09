@@ -45,50 +45,49 @@ model_sensor = SFTPSensor(
 """
 tasks
 """
-
-config = Variable.get('config', deserialize_json=True)
-libtorch_config = config['libtorch']
-train_libtorch = DockerOperator(
-    task_id='train_libtorch',
+common_args = dict(
     image='train_server',
     docker_url='unix://var/run/docker.sock',
-    command='./main {data_path} {model_path} {train_batch_sz} {test_batch_sz} {n_epochs} {lr}'.format(**libtorch_config),
-    working_dir='/home/app/lenet5_libtorch',
+    volumes=['/var/run/docker.sock:/var/run/docker.sock', '/home/ubuntu/ml2_takehome/models:/home/models'],
     xcom_push=True,
     xcom_all=True,
     tty=True,
+    user='root',
     dag=dag
 )
-"""
+
+config = Variable.get('config', deserialize_json=True)
+
+libtorch_config = config['libtorch']
+train_libtorch = DockerOperator(
+    task_id='train_libtorch',
+    command='./main {data_path} {model_path} {train_batch_sz} {test_batch_sz} {n_epochs} {lr}'.format(**libtorch_config),
+    working_dir='/home/app/lenet5_libtorch',
+    **common_args
+)
+
 pytorch_config = config['pytorch']
 train_pytorch = DockerOperator(
     task_id='train_pytorch',
-    image='train_server',
-    docker_url='unix://var/run/docker.sock',
-    dag=dag
+    command='python3 lenet5_pytorch.py --data_path ./data --n_epochs {n_epochs} --train_batch_sz {train_batch_sz} --test_batch_sz {test_batch_sz} --lr {lr} --model_path {model_path}'.format(**pytorch_config),
+    working_dir='/home/app',
+    **common_args
 )
-"""
 
 tensorflow_config = config['tensorflow']
 train_tensorflow = DockerOperator(
     task_id='train_tensorflow',
-    image='train_server',
-    docker_url='unix://var/run/docker.sock',
     command='python3 lenet5_tensorflow.py --epochs {epochs} --batch_size {batch_size} --lr {lr} --model_path {model_path}'.format(**tensorflow_config),
     working_dir='/home/app',
-    xcom_push=True,
-    xcom_all=True,
-    tty=True,
-    dag=dag
+    **common_args
 )
 
 """
 archive_model = DockerOperator(
     task_id='data',
     image='train_server',
-    docker_url='unix://var/run/docker.sock',
     command='torch-model-archiver --model-name lenet5 --serialized-file model.pt --handler image_classifier',
-    dag=dag
+    **common_args
 )
 """
-train_libtorch >> train_tensorflow
+train_libtorch >> train_pytorch >> train_tensorflow

@@ -26,7 +26,7 @@ def build_lenet5():
         layers.Conv2D(
             filters=6, 
             kernel_size=(5, 5),
-            activation='tanh',
+            activation='relu',
             padding='same',
             input_shape=(1, 32, 32, 1)
         )
@@ -38,19 +38,23 @@ def build_lenet5():
             filters=16, 
             kernel_size=(5, 5),
             padding='same',
-            activation='tanh'
+            activation='relu'
         )
     )
     model.add(layers.MaxPool2D())
 
-    model.add(layers.Flatten())
 
     model.add(
-        layers.Dense(
-            units=120, 
+        layers.Conv2D(
+            filters=120, 
+            kernel_size=(5, 5),
+            padding='same',
             activation='relu'
         )
     )
+
+    model.add(layers.Flatten())
+
     model.add(
         layers.Dense(
             units=84, 
@@ -96,12 +100,9 @@ if __name__ == "__main__":
         epochs=args.epochs
     )
 
-    model.summary()
-
     loss, acc = model.evaluate(*test_data)
 
     export_dir = os.path.join(args.model_path, 'tensorflow', date.today().strftime('%Y%m%d'))
-    if not os.path.exists(export_dir):
-        os.makedirs(export_dir, exist_ok=True)
 
     model.save(export_dir)
+

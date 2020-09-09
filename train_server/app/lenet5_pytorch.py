@@ -1,169 +1,119 @@
-import torch.nn as nn
-from collections import OrderedDict
+import sys
+import argparse
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
-from torchvision.datasets.mnist import MNIST
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+from torch.optim.lr_scheduler import StepLR
 
-class C1(nn.Module):
+
+class Net(nn.Module):
     def __init__(self):
-        super(C1, self).__init__()
+        super(Net, self).__init__()
+        self.c1 = nn.Conv2d(1, 6, 5, 1, 2)
+        self.c3 = nn.Conv2d(6, 16, 5, 1)
+        self.c5 = nn.Conv2d(16, 120, 5, 1)
+        self.f6 = nn.Linear(120, 84)
+        self.output = nn.Linear(84, 10)
 
-        self.c1 = nn.Sequential(OrderedDict([
-            ('c1', nn.Conv2d(1, 6, kernel_size=(5, 5))),
-            ('relu1', nn.ReLU()),
-            ('s1', nn.MaxPool2d(kernel_size=(2, 2), stride=2))
-        ]))
+    def forward(self, x):
+        x = self.c1(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
 
-    def forward(self, img):
-        output = self.c1(img)
+        x = self.c3(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+
+        x = self.c5(x)
+        x = F.relu(x)
+
+        x = torch.flatten(x, 1)
+
+        x = self.f6(x)
+        x = F.relu(x)
+
+        x = self.output(x)
+        output = F.log_softmax(x, dim=1)
         return output
 
 
-class C2(nn.Module):
-    def __init__(self):
-        super(C2, self).__init__()
-
-        self.c2 = nn.Sequential(OrderedDict([
-            ('c2', nn.Conv2d(6, 16, kernel_size=(5, 5))),
-            ('relu2', nn.ReLU()),
-            ('s2', nn.MaxPool2d(kernel_size=(2, 2), stride=2))
-        ]))
-
-    def forward(self, img):
-        output = self.c2(img)
-        return output
-
-
-class C3(nn.Module):
-    def __init__(self):
-        super(C3, self).__init__()
-
-        self.c3 = nn.Sequential(OrderedDict([
-            ('c3', nn.Conv2d(16, 120, kernel_size=(5, 5))),
-            ('relu3', nn.ReLU())
-        ]))
-
-    def forward(self, img):
-        output = self.c3(img)
-        return output
-
-
-class F4(nn.Module):
-    def __init__(self):
-        super(F4, self).__init__()
-
-        self.f4 = nn.Sequential(OrderedDict([
-            ('f4', nn.Linear(120, 84)),
-            ('relu4', nn.ReLU())
-        ]))
-
-    def forward(self, img):
-        output = self.f4(img)
-        return output
-
-
-class F5(nn.Module):
-    def __init__(self):
-        super(F5, self).__init__()
-
-        self.f5 = nn.Sequential(OrderedDict([
-            ('f5', nn.Linear(84, 10)),
-            ('sig5', nn.LogSoftmax(dim=-1))
-        ]))
-
-    def forward(self, img):
-        output = self.f5(img)
-        return output
-
-
-class LeNet5(nn.Module):
-    """
-    Input - 1x32x32
-    Output - 10
-    """
-    def __init__(self):
-        super(LeNet5, self).__init__()
-
-        self.c1 = C1()
-        self.c2_1 = C2() 
-        self.c2_2 = C2() 
-        self.c3 = C3() 
-        self.f4 = F4() 
-        self.f5 = F5() 
-
-    def forward(self, img):
-        output = self.c1(img)
-
-        x = self.c2_1(output)
-        output = self.c2_2(output)
-
-        output += x
-
-        output = self.c3(output)
-        output = output.view(img.size(0), -1)
-        output = self.f4(output)
-        output = self.f5(output)
-        return output
-
-data_train = MNIST('./data/mnist',
-                   download=True,
-                   transform=transforms.Compose([
-                       transforms.Resize((32, 32)),
-                       transforms.ToTensor()]))
-                       
-data_test = MNIST('./data/mnist',
-                  train=False,
-                  download=True,
-                  transform=transforms.Compose([
-                      transforms.Resize((32, 32)),
-                      transforms.ToTensor()]))
-
-
-def train(epoch):
-    net.train()
-    loss_list, batch_list = [], []
-    for i, (images, labels) in enumerate(data_train_loader):
+def train(args, model, device, train_loader, optimizer, epoch):
+    model.train()
+    for batch_idx, (data, target) in enumerate(train_loader):
+        data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
-
-        output = net(images)
-
-        loss = criterion(output, labels)
-
-        loss_list.append(loss.detach().cpu().item())
-        batch_list.append(i+1)
-
-        if i % 10 == 0:
-            print('Train - Epoch %d, Batch: %d, Loss: %f' % (epoch, i, loss.detach().cpu().item()))
-
+        output = model(data)
+        loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
-
-def test():
-    net.eval()
-    total_correct = 0
-    avg_loss = 0.0
-    for i, (images, labels) in enumerate(data_test_loader):
-        output = net(images)
-        avg_loss += criterion(output, labels).sum()
-        pred = output.detach().max(1)[1]
-        total_correct += pred.eq(labels.view_as(pred)).sum()
-
-    avg_loss /= len(data_test)
-    print('Test Avg. Loss: %f, Accuracy: %f' % (avg_loss.detach().cpu().item(), float(total_correct) / len(data_test)))
+        if batch_idx % 1000 == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(data), len(train_loader.dataset),
+                100. * batch_idx / len(train_loader), loss.item()))
 
 
-def train_and_test(epoch):
-    train(epoch)
-    test()
+def test(model, device, test_loader):
+    model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device), target.to(device)
+            output = model(data)
+            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
-data_train_loader = DataLoader(data_train, batch_size=256, shuffle=True, num_workers=8)
-data_test_loader = DataLoader(data_test, batch_size=1024, num_workers=8)
+    test_loss /= len(test_loader.dataset)
 
-net = LeNet5()
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters(), lr=2e-3)
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        test_loss, correct, len(test_loader.dataset),
+        100. * correct / len(test_loader.dataset)))
 
-train_and_test(10)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_path', type=str)
+    parser.add_argument('--model_path', type=str)
+    parser.add_argument('--train_batch_sz', type=int)
+    parser.add_argument('--test_batch_sz', type=int)
+    parser.add_argument('--n_epochs', type=int)
+    parser.add_argument('--lr', type=float)
+
+    if len(sys.argv) != 13:
+        print("usage: python3 lenet5_pytorch.py --data_path ./data --n_epochs 10 --train_batch_sz 64 --test_batch_sz 1024 --lr 0.01 --model_path ../models")
+        exit()
+
+    args = parser.parse_args()
+
+    torch.manual_seed(42)
+
+    device = torch.device("cpu")
+
+    transform=transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+        ])
+    dataset1 = datasets.MNIST(args.data_path, train=True, download=True,
+                       transform=transform)
+    dataset2 = datasets.MNIST(args.data_path, train=False,
+                       transform=transform)
+    train_loader = torch.utils.data.DataLoader(dataset1, args.train_batch_sz)
+    test_loader = torch.utils.data.DataLoader(dataset2, args.test_batch_sz)
+
+    model = Net().to(device)
+    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+
+    scheduler = StepLR(optimizer, step_size=1)
+    for epoch in range(1, args.n_epochs + 1):
+        train(args, model, device, train_loader, optimizer, epoch)
+        test(model, device, test_loader)
+        scheduler.step()
+
+    torch.save(model.state_dict(), "model.pt")
+
+
+if __name__ == '__main__':
+    main()
