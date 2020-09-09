@@ -24,17 +24,13 @@ Which inlcudes:
 
 ```docker-compose up -d```
 
-url : aws.com
+url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com
 
-port
-
-8080 airflow
-
-8081-8082 ts
-
-8500-8501 tfs
-
-??? tensorboard
+|                    | port                                     |
+|--------------------|------------------------------------------|
+| airflow            | 8080: admin                              |
+| torchserve         | 8081: Inference API 8082: Management API |
+| tensorflow/serving | 8500: gRPC 8501: REST API                |
 
 ### Training
 
