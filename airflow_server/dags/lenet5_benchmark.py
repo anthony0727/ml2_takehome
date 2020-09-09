@@ -5,6 +5,8 @@ from pathlib import Path
 from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.docker_operator import DockerOperator
+from airflow.operators.http_operator import SimpleHttpOperator
+from airflow.operators.bash_operator import BashOperator
 
 """
 DAG 
@@ -82,12 +84,35 @@ train_tensorflow = DockerOperator(
     **common_args
 )
 
-"""
-archive_model = DockerOperator(
-    task_id='data',
-    image='train_server',
-    command='torch-model-archiver --model-name lenet5 --serialized-file model.pt --handler image_classifier',
+
+archive_libtorch = DockerOperator(
+    task_id='archive_libtorch',
+    command='torch-model-archiver --model-name lenet5 --serialized-file /home/ubuntu/ml2_takehome/models/libtorch/model.pt --handler image_classifier',
     **common_args
 )
-"""
-train_libtorch >> train_pytorch >> train_tensorflow
+
+archive_pytorch = DockerOperator(
+    task_id='archive_pytorch',
+    command='torch-model-archiver --model-name lenet5 --serialized-file /home/ubuntu/ml2_takehome/models/libtorch/model.pt --handler image_classifier',
+    **common_args
+)
+
+deploy_libtorch = BashOperator(
+    task_id='deploy_libtorch',
+    bash_command='echo libtorch',
+    dag=dag
+)
+
+deploy_pytorch = BashOperator(
+    task_id='deploy_pytorch',
+    bash_command='echo pytorch',
+    dag=dag
+)
+
+deploy_tensorflow = BashOperator(
+    task_id='deploy_tensorflow',
+    bash_command='echo tensorflow',
+    dag=dag
+)
+
+train_libtorch >> train_pytorch >> train_tensorflow >> archive_libtorch >> archive_pytorch >> [deploy_libtorch, deploy_pytorch, deploy_tensorflow]

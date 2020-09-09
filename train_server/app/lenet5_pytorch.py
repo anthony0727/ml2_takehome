@@ -104,7 +104,7 @@ def main():
     test_loader = torch.utils.data.DataLoader(dataset2, args.test_batch_sz)
 
     model = Net().to(device)
-    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     scheduler = StepLR(optimizer, step_size=1)
     for epoch in range(1, args.n_epochs + 1):
@@ -112,7 +112,7 @@ def main():
         test(model, device, test_loader)
         scheduler.step()
 
-    torch.save(model.state_dict(), "model.pt")
+    torch.save(model.state_dict(), args.model_path)
 
 
 if __name__ == '__main__':
