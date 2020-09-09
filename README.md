@@ -34,7 +34,7 @@ url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com:8080
 
 ### Inference
 
-[jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) 
+open [jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) 
 
 Followings are covered : 
 
