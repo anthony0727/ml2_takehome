@@ -79,14 +79,14 @@ All models are to be implemented in same conditions
 
 Layers
 
-| 층  | 종류 |필터 갯수 | 필터 크기 | 스트라이드 | 패딩 |
+| layer  | kind | num filter | filter size | stride | padding |
 |--- |--- |----| ----|----|----|
-| c1 |합성곱| 6   | (5,5) | 1  | valid |
+| c1 |conv| 6   | (5,5) | 1  | valid |
 | s2 |pooling| --- | (2,2) | 2  | valid | 
-| c3 |합성곱| 16  | (10,10) | 1 | valid |
+| c3 |conv| 16  | (10,10) | 1 | valid |
 | s4 |pooling| --- | (2,2) | 2 | valid |
-| c5 |합성곱 | 120  | (5,5) | 1  | valid |
-| f6 |FC   | 84   | --- | ---  | --- |
+| c5 |conv| 120  | (5,5) | 1  | valid |
+| f6 |dense| 84   | --- | ---  | --- |
 | OUT | softmax | 10 |  --- | --- | --- |
 
 
