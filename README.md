@@ -50,7 +50,7 @@ gantt
 
 ### Inference
 
-open [jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) or `/notebook/lenet5_benchmark.ipynb`
+open [notebook/lenet5_benchmark.ipynb](https://github.com/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) in colab. (click the colab button)
 
 Followings are covered : 
 
