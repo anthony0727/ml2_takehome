@@ -3,6 +3,10 @@
 ## Objective
 
 Implement Lenet5 with Libtorch [**done**]
+* source code : [train_server/app/src](https://github.com/anthony0727/ml2_takehome/tree/master/train_server/app/src)
+* code review : [wiki](https://github.com/anthony0727/ml2_takehome/wiki/Code-Review)
+
+---
 
 Additionally, I'm intending to advance the project to some extent
 
