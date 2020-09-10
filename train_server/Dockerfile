@@ -14,6 +14,7 @@ RUN apt-get update && \
 
 COPY app /home/app
 WORKDIR /home/app
+RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 RUN wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
 RUN unzip libtorch-shared-with-deps-latest.zip -d /usr/local

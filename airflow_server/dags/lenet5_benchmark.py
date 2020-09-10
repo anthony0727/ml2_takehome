@@ -86,14 +86,14 @@ train_tensorflow = DockerOperator(
 
 archive_libtorch = DockerOperator(
     task_id='archive_libtorch',
-    command='torch-model-archiver --model-name lenet5_libtorch -v 1.0 --serialized-file model.pt --handler handler.py',
+    command='torch-model-archiver -f --model-name lenet5_libtorch -v 1.0 --serialized-file model.pt --handler handler.py',
     working_dir='/home/models/libtorch',
     **common_args
 )
 
 archive_pytorch = DockerOperator(
     task_id='archive_pytorch',
-    command='torch-model-archiver --model-name lenet5_pytorch -v 1.0 --serialized-file model.pt --handler handler.py',
+    command='torch-model-archiver -f --model-name lenet5_pytorch -v 1.0 --serialized-file model.pt --handler handler.py',
     working_dir='/home/models/pytorch',
     **common_args
 )

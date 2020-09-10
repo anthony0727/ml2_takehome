@@ -121,6 +121,6 @@ services:
             - '8083:8082'
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - ./models/libtorch:/home/model-server/model-store
-        command: torchserve --start --ncs --model-store /home/model-server/model-store --models lenet5=lenet5.mar
-
+            - ./models/pytorch/lenet5_pytorch.mar:/home/model-server/model-store/lenet5_pytorch.mar
+            - ./models/libtorch/lenet5_libtorch.mar:/home/model-server/model-store/lenet5_libtorch.mar
+        command: torchserve --start --ncs --model-store /home/model-server/model-store --models lenet5_pytorch=lenet5_pytorch.mar lenet5_libtorch=lenet5_libtorch.mar
