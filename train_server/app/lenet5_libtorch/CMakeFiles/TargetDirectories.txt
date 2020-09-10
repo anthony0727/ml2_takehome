@@ -1,0 +1,3 @@
+/home/anthony/repo/ml2_takehome/train_server/app/lenet5_libtorch/CMakeFiles/rebuild_cache.dir
+/home/anthony/repo/ml2_takehome/train_server/app/lenet5_libtorch/CMakeFiles/edit_cache.dir
+/home/anthony/repo/ml2_takehome/train_server/app/lenet5_libtorch/CMakeFiles/main.dir
