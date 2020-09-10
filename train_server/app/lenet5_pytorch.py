@@ -20,11 +20,11 @@ class Net(nn.Module):
     def forward(self, x):
         x = self.c1(x)
         x = F.relu(x)
-        x = F.max_pool2d(x, 2)
+        x = F.max_pool2d(x, 2, 2)
 
         x = self.c3(x)
         x = F.relu(x)
-        x = F.max_pool2d(x, 2)
+        x = F.max_pool2d(x, 2, 2)
 
         x = self.c5(x)
         x = F.relu(x)

@@ -91,7 +91,7 @@ if __name__ == "__main__":
     model.compile(
         loss='sparse_categorical_crossentropy',
         optimizer=keras.optimizers.Adam(args.lr),
-        metrics=[keras.metrics.SparseCategoricalAccuracy()]
+        metrics=['accuracy']
     )
 
     model.fit(

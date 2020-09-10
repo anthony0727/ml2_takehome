@@ -8,4 +8,4 @@
         #    - ./models:/home/models
         #      #- ./train_server/app:/home/app
 
-docker run -d --rm train_server -v /var/run/docker.sock:/var/run/docker.sock -v ../models:/home/model
+docker run -d -it --rm -v /var/run/docker.sock:/var/run/docker.sock -v /home/ubuntu/ml2_takehome/models:/home/models train_server
