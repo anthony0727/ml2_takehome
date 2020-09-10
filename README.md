@@ -128,9 +128,9 @@ tensorflow/serving:
 
 libtorch:
 * https://github.com/prabhuomkar/pytorch-cpp.git
-* 
 
 docker.sock
+* https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket
 
 lenet:
 * http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf

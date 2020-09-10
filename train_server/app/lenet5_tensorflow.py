@@ -31,7 +31,7 @@ def build_lenet5():
             input_shape=(1, 32, 32, 1)
         )
     )
-    model.add(layers.MaxPool2D())
+    model.add(layers.MaxPool2D(strides=2, padding='same'))
 
     model.add(
         layers.Conv2D(
@@ -41,7 +41,7 @@ def build_lenet5():
             activation='relu'
         )
     )
-    model.add(layers.MaxPool2D())
+    model.add(layers.MaxPool2D(strides=2, padding='same'))
 
 
     model.add(

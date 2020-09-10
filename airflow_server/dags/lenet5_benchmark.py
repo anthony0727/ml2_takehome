@@ -52,7 +52,6 @@ common_args = dict(
     docker_url='unix://var/run/docker.sock',
     volumes=['/var/run/docker.sock:/var/run/docker.sock', '/home/ubuntu/ml2_takehome/models:/home/models'],
     xcom_push=True,
-    xcom_all=True,
     tty=True,
     user='root',
     dag=dag
@@ -87,13 +86,15 @@ train_tensorflow = DockerOperator(
 
 archive_libtorch = DockerOperator(
     task_id='archive_libtorch',
-    command='torch-model-archiver --model-name lenet5 --serialized-file /home/ubuntu/ml2_takehome/models/libtorch/model.pt --handler image_classifier',
+    command='torch-model-archiver --model-name lenet5 --serialized-file model.pt --handler handler.py',
+    working_dir='/home/models/libtorch',
     **common_args
 )
 
 archive_pytorch = DockerOperator(
     task_id='archive_pytorch',
-    command='torch-model-archiver --model-name lenet5 --serialized-file /home/ubuntu/ml2_takehome/models/libtorch/model.pt --handler image_classifier',
+    command='torch-model-archiver --model-name lenet5 --serialized-file pytorch/model.pt --handler handler.py',
+    working_dir='/home/models/pytorch',
     **common_args
 )
 
