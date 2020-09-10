@@ -1,40 +1,21 @@
 #include "lenet5_libtorch.hpp"
 
-torch::Tensor Net::forward(torch::Tensor x)
-{
-  x = c1->forward(x);                       // 6@28x28
-  x = torch::relu(x);
-  x = torch::max_pool2d(x, {2, 2}, {2, 2}); // 6@14x14
-  x = c3->forward(x);                       // 16@10x10
-  x = torch::relu(x);
-  x = torch::max_pool2d(x, {2, 2}, {2, 2}); // 16@10x10
-  x = c5->forward(x);                       // 120@1x1
-  x = torch::relu(x);
-  x = x.view({x.size(0), -1});
-  x = f6->forward(x);     // 120->84
-  x = torch::relu(x);
-  x = output->forward(x); // 84->10
-  x = torch::log_softmax(x, /*dim=*/1);
-
-  return x;
-}
-
 template <typename DataLoader>
 void train(
     size_t epoch,
-    Net &model,
+    Lenet5 &model,
     torch::Device device,
     DataLoader &data_loader,
     torch::optim::Optimizer &optimizer,
     size_t dataset_size)
 {
-  model.train();
+  model->train();
   size_t batch_idx = 0;
   for (auto &batch : data_loader)
   {
     auto data = batch.data.to(device), targets = batch.target.to(device);
     optimizer.zero_grad();
-    auto output = model.forward(data);
+    auto output = model->forward(data);
     auto loss = torch::nll_loss(output, targets);
     AT_ASSERT(!std::isnan(loss.template item<float>()));
     loss.backward();
@@ -54,19 +35,19 @@ void train(
 
 template <typename DataLoader>
 void test(
-    Net &model,
+    Lenet5 &model,
     torch::Device device,
     DataLoader &data_loader,
     size_t dataset_size)
 {
   torch::NoGradGuard no_grad;
-  model.eval();
+  model->eval();
   double test_loss = 0;
   int32_t correct = 0;
   for (const auto &batch : data_loader)
   {
     auto data = batch.data.to(device), targets = batch.target.to(device);
-    auto output = model.forward(data);
+    auto output = model->forward(data);
     test_loss += torch::nll_loss(
                      output,
                      targets,
@@ -84,10 +65,10 @@ void test(
       static_cast<double>(correct) / dataset_size);
 }
 
-void save_model(Net model, string model_path)
+void save_model(Lenet5 model, string model_path)
 {
   torch::serialize::OutputArchive output_archive;
-  model.save(output_archive);
+  model->save(output_archive);
   output_archive.save_to(model_path);
 }
 
@@ -96,7 +77,7 @@ auto main(int argc, char *argv[]) -> int
   if (argc != 7)
   {
     cerr << "usage: ./main <data_path> <model_path> <train_batch_sz> <test_batch_sz> <n_epoch> <lr>\n"
-         << "example: ./main ./data ../../models/libtorch/model.pt 64 1000 10 0.01" << endl;
+         << "example: ./main ../data ../../models/libtorch/model.pt 64 1000 10 0.01" << endl;
 
     return -1;
   }
@@ -126,8 +107,8 @@ auto main(int argc, char *argv[]) -> int
   }
   torch::Device device(device_type);
 
-  Net model;
-  model.to(device);
+  Lenet5 model;
+  model->to(device);
 
   auto train_dataset =
       torch::data::datasets::MNIST(kDataRoot)
@@ -148,29 +129,31 @@ auto main(int argc, char *argv[]) -> int
       torch::data::make_data_loader(std::move(test_dataset), kTestBatchSize);
 
   torch::optim::Adam optimizer(
-      model.parameters(), torch::optim::AdamOptions(lr));
+      model->parameters(), torch::optim::AdamOptions(lr));
 
   for (size_t epoch = 1; epoch <= kNumberOfEpochs; ++epoch)
   {
     train(epoch, model, device, *train_loader, optimizer, train_dataset_size);
     test(model, device, *test_loader, test_dataset_size);
   }
+  torch::save(model, model_path);
 
-  save_model(model, model_path);
-  // torch::save(model, model_path);
+  // check if archived model is loadable
+  Lenet5 module;
+  try
+  {
+    // Deserialize the ScriptModule from a file using torch::jit::load().
+    torch::load(module, model_path);
+  }
+  catch (const c10::Error &e)
+  {
+    std::cerr << "error loading the model\n";
+    return -1;
+  }
 
-  // torch::jit::script::Module module;
-  // try
-  // {
-  //   // Deserialize the ScriptModule from a file using torch::jit::load().
-  //   module = torch::jit::load(model_path);
-  // }
-  // catch (const c10::Error &e)
-  // {
-  //   std::cerr << "error loading the model\n";
-  //   return -1;
-  // }
-
-  // std::cout << "ok\n";
+  // auto parameters = module->named_parameters();
+  for (auto& p : module->named_parameters())
+  {
+    std::cout << p.key() << std::endl;
+  }
 }
-

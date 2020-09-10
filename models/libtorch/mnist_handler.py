@@ -15,8 +15,8 @@ class MNISTDigitClassifier(ImageClassifier):
 
     image_processing = transforms.Compose([
         # transforms.Resize(28),
-        transforms.ToTensor()
-        # transforms.Normalize((0.5,), (0.5,))
+        transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5,))
     ])
 
     def postprocess(self, data):
