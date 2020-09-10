@@ -2,23 +2,23 @@
 
 ## Objective
 
-Implement Lenet5 with Libtorch
+Implement Lenet5 with Libtorch [**done**]
 
 Additionally, I'm intending to advance the project to some extent
 
 Which inlcudes:
 
-* Benchmark Performance
-  * training time: Libtorch vs Pytorch vs Tensorflow
-  * inference TPS: pytroch/torchserve(ts) vs tensorflow/serving(tfs)
+* Benchmark Performance 
+  * training time: Libtorch vs Pytorch vs Tensorflow [**done**]
+  * inference TPS: pytroch/torchserve(ts) [**undone**] vs tensorflow/serving(tfs) [**done**] 
 
-* Orchestration
+* Orchestration [**done**]
   * automate ml lifecycle with Apache Airflow
 
-* Dockerize
+* Dockerize [**done**]
   * all logics are modularized with docker container
 
-* If time allows, gather all models around and monitor them with tensorboard
+* If time allows, gather all models around and monitor them with tensorboard [**undone**]
 
 ## Usage
 
