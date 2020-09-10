@@ -26,15 +26,27 @@ Which inlcudes:
 
 1. open airflow 
 
-url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com:8080
+url : http://ec2-15-165-35-168.ap-northeast-2.compute.amazonaws.com:8080
 
 2. click play button
 
 ![](img/airflow.png)
 
+task graph
+
+![](img/airflow_graph.png)
+
+monitor log
+
+![](img/airflow_log.png)
+
+gantt
+
+![](img/airflow_gantt.png)
+
 ### Inference
 
-open [jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) 
+open [jupyter notebook](https://colab.research.google.com/github/anthony0727/ml2_takehome/blob/master/notebook/lenet5_benchmark.ipynb) or `/notebook/lenet5_benchmark.ipynb`
 
 Followings are covered : 
 
@@ -115,7 +127,7 @@ having trouble with loading TorchScript generated model to torchserve
 
 why torchserve cannot recognize model?
 
-looking into loading model logic in torchserve, still can't figure out why
+looking into model loading logic in torchserve, still can't figure out why
 
 ## Reference
 
@@ -125,9 +137,6 @@ torchserve:
 
 tensorflow/serving:
 * https://www.tensorflow.org/tfx/guide/serving
-
-libtorch:
-* https://github.com/prabhuomkar/pytorch-cpp.git
 
 docker.sock
 * https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket
