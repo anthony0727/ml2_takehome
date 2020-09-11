@@ -59,6 +59,9 @@ Followings are covered :
 
 ### build & run
 
+Tested : Ubuntu 18.04(recommended)
+Tested, but not guaranteed : CentOS 8, MacOS
+
 |                    | port                                     |
 |--------------------|------------------------------------------|
 | airflow            | 8080: admin                              |
