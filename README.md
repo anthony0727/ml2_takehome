@@ -59,8 +59,6 @@ Followings are covered :
 
 ### build & run
 
-url : http://ec2-3-35-42-27.ap-northeast-2.compute.amazonaws.com
-
 |                    | port                                     |
 |--------------------|------------------------------------------|
 | airflow            | 8080: admin                              |
