@@ -74,7 +74,6 @@ prerequisites :
 
 build & run :
 ```Shell
-git clone https://github.com/anthony0727/ml2_takehome.git
 
 # build train server image
 cd ml2_takehome/train_server
