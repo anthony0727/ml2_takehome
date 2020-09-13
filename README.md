@@ -100,11 +100,11 @@ Layers
 
 | layer  | kind | num filter | filter size | stride | padding |
 |--- |--- |----| ----|----|----|
-| c1 |conv| 6   | (5,5) | 1  | valid |
-| s2 |pooling| --- | (2,2) | 2  | valid | 
-| c3 |conv| 16  | (10,10) | 1 | valid |
-| s4 |pooling| --- | (2,2) | 2 | valid |
-| c5 |conv| 120  | (5,5) | 1  | valid |
+| c1 |conv| 6   | (5,5) | 1  | same |
+| s2 |max pooling| --- | (2,2) | 2  | same | 
+| c3 |conv| 16  | (10,10) | 1 | same |
+| s4 |max pooling| --- | (2,2) | 2 | same |
+| c5 |conv| 120  | (5,5) | 1  | same |
 | f6 |dense| 84   | --- | ---  | --- |
 | OUT | softmax | 10 |  --- | --- | --- |
 
