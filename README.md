@@ -106,7 +106,7 @@ Layers
 | s4 |max pooling| --- | (2,2) | 2 | same |
 | c5 |conv| 120  | (5,5) | 1  | same |
 | f6 |dense| 84   | --- | ---  | --- |
-| OUT | softmax | 10 |  --- | --- | --- |
+| output | softmax | 10 |  --- | --- | --- |
 
 
 Optimizer : Adam
