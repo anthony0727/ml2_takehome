@@ -102,7 +102,7 @@ Layers
 |--- |--- |----| ----|----|----|
 | c1 |conv| 6   | (5,5) | 1  | same |
 | s2 |max pooling| --- | (2,2) | 2  | same | 
-| c3 |conv| 16  | (10,10) | 1 | same |
+| c3 |conv| 16  | (5,5) | 1 | same |
 | s4 |max pooling| --- | (2,2) | 2 | same |
 | c5 |conv| 120  | (5,5) | 1  | same |
 | f6 |dense| 84   | --- | ---  | --- |
